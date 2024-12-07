@@ -1,12 +1,13 @@
 {
+
   "name": "woman-creator",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
   "dependencies": {
     "node-fetch": "^2.6.7"
   },
-  "devDependencies": {},
+  "devDependencies": {}
+}
+  },
   "scripts": {},
   "keywords": [],
   "author": "",
