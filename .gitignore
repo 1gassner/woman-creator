@@ -1,0 +1,81 @@
+# Local Netlify folder
+.netlify
+
+# Node.js dependencies
+node_modules/
+
+# Log files
+*.log
+
+# Environment variables
+.env
+
+
+# Andere Dateien und Verzeichnisse, die ausgeschlossen werden sollen
+# Node.js dependencies
+node_modules/
+
+# Log files
+*.log
+
+# Environment variables
+.env
+
+
+# Weitere Dateien und Verzeichnisse, die ignoriert werden sollen
+.DS_Store
+
+# Node.js dependencies
+node_modules/
+
+# Log files
+*.log
+
+# Environment variables
+.env
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+
+# Weitere Dateien und Verzeichnisse, die ignoriert werden sollen
+# Node.js dependencies
+node_modules/
+
+# Log files
+*.log
+
+# Environment variables
+.env
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+
+# Weitere Dateien und Verzeichnisse, die ignoriert werden sollen
+# Node.js dependencies
+node_modules/
+
+# Log files
+*.log
+
+# Environment variables
+.env
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+
+# Weitere Dateien und Verzeichnisse, die ignoriert werden sollen

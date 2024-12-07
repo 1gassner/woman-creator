@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Woman Creator - Fuck/Marry/Kill Optimiert</title>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-color: #1e1e1e;
+            --card-bg: #2a2a2a;
+            --accent-color: #ff79c6;
+            --accent-color-secondary: #8be9fd;
+            --text-color: #f8f8f2;
+            --text-light: #ccc;
+            --success-color: #50fa7b;
+            --danger-color: #ff5555;
+            --font-family: 'Arial', sans-serif;
+            --transition-speed: 0.3s;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-family);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: var(--bg-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 20px;
+            border-bottom: 1px solid #333;
+            position: relative;
+            z-index: 10;
+        }
+
+        header h1 {
+            font-size: 1.5rem;
+            margin: 0;
+        }
+
+        header .tutorial-button {
+            background: none;
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background var(--transition-speed), color var(--transition-speed);
+        }
+
+        header .tutorial-button:hover {
+            background: var(--accent-color);
+            color: #000;
+        }
+
+        /* Responsive, flexiblere Karten-Anordnung: auto-fit & minmax */
+        .container {
+            flex: 1;
+            display: grid;
+            gap: 20px;
+            padding: 20px;
+            box-sizing: border-box;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            margin-left: 200px;
+            transition: margin-left var(--transition-speed);
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 200px;
+            background: #121212;
+            display: flex;
+            flex-direction: column;
+            padding-top: 70px;
+            box-sizing: border-box;
+            border-right: 1px solid #333;
+            z-index: 100;
+            transition: transform var(--transition-speed);
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 15px;
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 0.9rem;
+            border-bottom: 1px solid #333;
+            transition: background var(--transition-speed), color var(--transition-speed);
+        }
+
+        .sidebar a:hover {
+            background: var(--accent-color-secondary);
+            color: #000;
+        }
+
+        body > header {
+            margin-left: 200px;
+        }
+
+        .container {
+            margin-left: 200px;
+        }
+
+        @media(max-width: 700px) {
+            body > header { margin-left: 0; }
+            .sidebar {
+                position: static;
+                width: 100%;
+                height: auto;
+                display: flex;
+                flex-direction: row;
+                overflow-x: auto;
+                border-right: none;
+                border-bottom: 1px solid #333; 
+                padding-top: 0;
+                justify-content: space-around;
+            }
+            .container { margin-left: 0; }
+            .sidebar a { border: none; flex: 1; text-align: center; }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            transition: transform 0.2s ease, background var(--transition-speed);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card img {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: cover;
+        }
+
+        .card .info {
+            padding: 10px;
+            font-size: 0.9rem;
+        }
+
+        .profile-info {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .profile-info h4 {
+            margin: 5px 0 3px;
+            color: var(--accent-color);
+            font-size: 1rem;
+        }
+
+        .profile-info p {
+            margin: 2px 0;
+        }
+
+        .card .actions {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 10px;
+        }
+
+        .card button {
+            background: none;
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background var(--transition-speed) ease, color var(--transition-speed) ease;
+        }
+
+        .card button:hover {
+            background: var(--accent-color);
+            color: #000;
+        }
+
+        /* Hintergründe bei Aktionen */
+        .card-fuck { background: linear-gradient(rgba(255,140,0,0.2), rgba(255,140,0,0.2)) no-repeat center/cover; }
+        .card-marry { background: linear-gradient(rgba(0,255,0,0.2), rgba(0,255,0,0.2)) no-repeat center/cover; }
+        .card-kill { background: linear-gradient(rgba(255,0,0,0.2), rgba(255,0,0,0.2)) no-repeat center/cover; }
+
+        .symbol {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 2.5rem;
+            z-index: 10;
+            pointer-events: none;
+            transform: scale(0);
+            opacity: 0;
+            animation: symbolAppear 0.4s ease forwards;
+        }
+
+        @keyframes symbolAppear {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.3); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Popups */
+        .popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: #2a2a2a;
+            color: var(--text-color);
+            padding: 20px;
+            border-radius: 10px;
+            z-index: 2000;
+            min-width: 300px;
+            max-width: 90%;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            opacity: 0;
+        }
+
+        .popup.show {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+
+        .popup h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: var(--accent-color);
+        }
+
+        .popup .close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            background: none;
+            border: none;
+            color: #fff;
+        }
+
+        .popup button {
+            background: var(--accent-color);
+            color: #000;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background var(--transition-speed), color var(--transition-speed);
+        }
+
+        .popup button:hover {
+            background: var(--accent-color-secondary);
+        }
+
+        #loader {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+            flex-direction: column;
+            color: #fff;
+            font-size: 1.2rem;
+        }
+
+        .loader-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #333;
+            border-top-color: var(--accent-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .feedback {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #000;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 5000;
+        }
+
+        .feedback.show {
+            opacity: 1;
+        }
+
+        .scoreboard {
+            position: fixed;
+            top: 0;
+            right: 0;
+            padding: 10px;
+            background: rgba(0,0,0,0.6);
+            color: #fff;
+            font-size: 0.9rem;
+            border-bottom-left-radius: 10px;
+            z-index: 150;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 5px;
+        }
+
+        .scoreboard .badges {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .scoreboard .badge {
+            background: var(--accent-color);
+            color: #000;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-size: 0.7rem;
+        }
+
+        #radarContainer, #barContainer {
+            max-width: 300px;
+            margin: 20px auto;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Deine Auswahl</h1>
+        <button class="tutorial-button" id="showTutorialBtn">Tutorial</button>
+    </header>
+    
+    <div class="sidebar">
+        <a href="#" id="openFavorites">❤️ Favoriten</a>
+        <a href="#" id="openHistory">📜 Verlauf</a>
+        <a href="#" id="showScores">📊 Dein Style-Gen</a>
+    </div>
+    
+    <div class="container" id="cardContainer"></div>
+    
+    <!-- Popups -->
+    <div class="popup" id="favoritesPopup" aria-hidden="true">
+        <button class="close" onclick="closePopup('favoritesPopup')" aria-label="Schließen">&times;</button>
+        <h3>Deine Favoriten</h3>
+        <div id="favoritesContent"></div>
+    </div>
+    
+    <div class="popup" id="historyPopup" aria-hidden="true">
+        <button class="close" onclick="closePopup('historyPopup')" aria-label="Schließen">&times;</button>
+        <h3>Dein Verlauf</h3>
+        <div id="historyContent"></div>
+    </div>
+    
+    <div class="popup" id="scoresPopup" aria-hidden="true">
+        <button class="close" onclick="closePopup('scoresPopup')" aria-label="Schließen">&times;</button>
+        <h3>Dein Style-Gen</h3>
+        <div id="radarContainer">
+            <canvas id="radarChart" width="300" height="300"></canvas>
+        </div>
+        <div id="barContainer">
+            <canvas id="barChart" width="300" height="300"></canvas>
+        </div>
+        <p>Hier siehst du eine vereinfachte Darstellung deiner Vorlieben.</p>
+    </div>
+    
+    <div class="popup" id="tutorialPopup" aria-hidden="true">
+        <button class="close" onclick="closePopup('tutorialPopup')" aria-label="Schließen">&times;</button>
+        <h3>Kurzinfo</h3>
+        <p>Bewerte die Profile mit "Fuck" (🔥), "Marry" (❤️) oder "Kill" (💀).</p>
+        <p>Marry = langfristig bevorzugt<br>
+        Fuck = kurzfristig attraktiv<br>
+        Kill = starkes Missfallen</p>
+        <p>Bewerte alle drei Damen, um neue zu erhalten.</p>
+        <button id="startButton">Start</button>
+    </div>
+    
+    <div class="popup" id="milestonePopup" aria-hidden="true">
+        <button class="close" onclick="closePopup('milestonePopup')" aria-label="Schließen">&times;</button>
+        <h3>Glückwunsch! 🎉</h3>
+        <p>Du hast ein neues Badge verdient!<br><span class="badge">🌟 Trendsetter</span></p>
+    </div>
+    
+    <div id="loader" role="alert" aria-live="assertive">
+        <div class="loader-spinner"></div>
+        <p id="loaderText">Lade neue Vorschläge...</p>
+    </div>
+    
+    <div class="feedback" id="feedbackMessage" role="status" aria-live="polite">Feedback</div>
+    
+    <div class="scoreboard" id="scoreboard">
+        <div>Punkte: <span id="pointsDisplay">0</span></div>
+        <div>Level: <span id="levelDisplay">1</span></div>
+        <div class="badges" id="badgeContainer"></div>
+    </div>
+    
+    <script>
+        // =============================
+        // Globale Variablen & Konfiguration
+        // =============================
+        const WEBHOOK_URL = '/.netlify/functions/proxy'; // Deine Netlify Function URL
+
+        let userPreferences = {
+            description: '',
+            criteria: {},
+            favorites: [],
+            history: [],
+            interactions: 0,
+            points: 0,
+            badges: []
+        };
+
+        let userScores = {
+            hairColor: { blond:0, braun:0, schwarz:0, rot:0 },
+            style: { casual:0, elegant:0, sportlich:0, modern:0 }
+        };
+
+        let currentCards = []; // Aktuell angezeigte Karten
+        let nextCards = []; // Vorgepufferte nächste Karten
+        let loading = false; 
+        let firstRound = true;
+
+        // Mindestalter pro Beruf
+        const professionMinAge = {
+            "ärztin": 25,
+            "ingenieurin": 23,
+            "künstlerin": 20,
+            "lehrerin": 23,
+            "designer": 21,
+            "marketing-spezialistin": 21,
+            "unternehmerin": 21
+        };
+
+        // =============================
+        // UI Funktionen
+        // =============================
+        function openPopup(id) { 
+            const popup = document.getElementById(id);
+            popup.classList.add('show');
+            popup.setAttribute('aria-hidden', 'false');
+        }
+
+        function closePopup(id) { 
+            const popup = document.getElementById(id);
+            popup.classList.remove('show');
+            popup.setAttribute('aria-hidden', 'true');
+        }
+
+        function showLoader() { 
+            const loader = document.getElementById('loader');
+            loader.style.display = 'flex';
+            loader.setAttribute('aria-hidden', 'false');
+        }
+
+        function hideLoader() { 
+            const loader = document.getElementById('loader');
+            loader.style.display = 'none';
+            loader.setAttribute('aria-hidden', 'true');
+        }
+
+        function showFeedback(msg) {
+            const f = document.getElementById('feedbackMessage');
+            f.textContent = msg; 
+            f.classList.add('show');
+            setTimeout(() => f.classList.remove('show'), 3000);
+        }
+
+        // =============================
+        // Ethnische Zuordnung
+        // =============================
+        function getEthnicTerm(origin) {
+            const originLower = origin.toLowerCase();
+            if (originLower.includes('japan') || originLower.includes('asian') || originLower.includes('japon')) {
+                return 'Asian';
+            } else if (originLower.includes('spanien') || originLower.includes('spanish') || originLower.includes('latina') || originLower.includes('latin')) {
+                return 'Latina';
+            } else if (originLower.includes('deutschland') || originLower.includes('germany') || originLower.includes('frankreich') || originLower.includes('france') || originLower.includes('italien') || originLower.includes('italy') || originLower.includes('europe')) {
+                return 'European';
+            } else if (originLower.includes('afrika') || originLower.includes('africa') || originLower.includes('african')) {
+                return 'African';
+            } else {
+                return '';
+            }
+        }
+
+        // =============================
+        // Verbesserte Fehlerbehandlung mit Retry
+        // =============================
+        async function fetchWithRetry(url, options={}, retries=3) {
+            for (let i=0; i<=retries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (!response.ok) throw new Error(`HTTP-Fehler: ${response.status}`);
+                    return await response.text();
+                } catch (err) {
+                    if (i === retries) {
+                        showFeedback('Bild konnte nicht geladen werden. Zeige Platzhalter.');
+                        return null;
+                    }
+                }
+            }
+            return null;
+        }
+
+        // =============================
+        // Prompt-Aufbau (Stichwortartig)
+        // =============================
+        function buildPrompt(attrs) {
+            let ageNum = parseInt(attrs.Alter);
+            let ageDesc = isNaN(ageNum) ? 'young' : `age ${ageNum}`;
+
+            let ethnicityDesc = getEthnicTerm(attrs.Herkunft);
+
+            let hairDesc = `${attrs.Haarfarbe.toLowerCase()}-haired`;
+            let eyesDesc = `${attrs.Augenfarbe.toLowerCase()} eyes`;
+            let styleDesc = `${attrs.Stil.toLowerCase()} style`;
+
+            let professionHint = "";
+            switch (attrs.Beruf.toLowerCase()) {
+                case "ärztin":
+                    professionHint = "stethoscope";
+                    break;
+                case "ingenieurin":
+                    professionHint = "engineering tools";
+                    break;
+                case "künstlerin":
+                    professionHint = "paintbrush";
+                    break;
+                case "unternehmerin":
+                    professionHint = "laptop";
+                    break;
+                case "lehrerin":
+                    professionHint = "books";
+                    break;
+                case "designer":
+                    professionHint = "design sketches";
+                    break;
+                case "marketing-spezialistin":
+                    professionHint = "marketing materials";
+                    break;
+                default:
+                    professionHint = "";
+            }
+
+            let werteHints = [];
+            if (attrs.Werte && attrs.Werte.length > 0) {
+                attrs.Werte.forEach(wert => {
+                    switch (wert.toLowerCase()) {
+                        case "abenteuer":
+                        case "freiheit":
+                            werteHints.push("adventurous spirit");
+                            break;
+                        case "familie":
+                            werteHints.push("family-oriented");
+                            break;
+                        case "bildung":
+                            werteHints.push("education advocate");
+                            break;
+                        case "offenheit":
+                            werteHints.push("open-minded");
+                            break;
+                        case "nachhaltigkeit":
+                            werteHints.push("sustainability advocate");
+                            break;
+                        case "ehrlichkeit":
+                            werteHints.push("honest");
+                            break;
+                        case "treue":
+                            werteHints.push("loyal");
+                            break;
+                        default:
+                            break;
+                    }
+                });
+            }
+
+            let personalityHint = "";
+            if (attrs.Persönlichkeit && attrs.Persönlichkeit.length > 0) {
+                if (attrs.Persönlichkeit.includes("humorvoll") || attrs.Persönlichkeit.includes("gesellig") || attrs.Persönlichkeit.includes("empathisch")) {
+                    personalityHint = "friendly smile";
+                } else if (attrs.Persönlichkeit.includes("abenteuerlustig")) {
+                    personalityHint = "energetic expression";
+                } else if (attrs.Persönlichkeit.includes("ruhig")) {
+                    personalityHint = "calm expression";
+                }
+            }
+
+            let promptParts = [
+                `${hairDesc} ${ethnicityDesc} woman`,
+                ageDesc,
+                eyesDesc,
+                styleDesc
+            ];
+
+            if (professionHint) promptParts.push(professionHint);
+            if (werteHints.length > 0) promptParts.push(...werteHints);
+            if (personalityHint) promptParts.push(personalityHint);
+
+            promptParts.push("photorealistic", "high resolution", "natural lighting", "soft shadows");
+
+            const prompt = promptParts.join(", ");
+
+            return prompt;
+        }
+
+        // =============================
+        // Bild holen
+        // =============================
+        async function getImageFromWebhook(prompt) {
+            try {
+                const payload = { prompt };
+                const response = await fetchWithRetry(WEBHOOK_URL, {
+                    method:'POST',
+                    headers:{'Content-Type':'application/json'},
+                    body: JSON.stringify(payload)
+                }, 3);
+
+                if (!response) {
+                    // Fallback
+                    return 'https://via.placeholder.com/400x300.png?text=Kein+Bild';
+                }
+
+                // Falls der Webhook JSON zurückgibt
+                try {
+                    const data = JSON.parse(response);
+                    return data.imageUrl || 'https://via.placeholder.com/400x300.png?text=Kein+Bild';
+                } catch (jsonError) {
+                    // Falls der Webhook die URL als reinen Text zurückgibt
+                    return response.trim() || 'https://via.placeholder.com/400x300.png?text=Kein+Bild';
+                }
+            } catch (error) {
+                console.error('Fehler beim Abrufen des Bildes:', error);
+                return 'https://via.placeholder.com/400x300.png?text=Kein+Bild';
+            }
+        }
+
+        // =============================
+        // Erste 3 Profile für erste Runde
+        // =============================
+        function distinctProfilesForFirstRound() {
+            return [
+                {
+                    Name:"Anna",
+                    Haarfarbe:"rot",
+                    Stil:"modern",
+                    Alter:28, // Mindestalter für Ärztin: 25
+                    Herkunft:"spanien",
+                    Beruf:"Ärztin",
+                    Augenfarbe:"blau",
+                    Persönlichkeit:["humorvoll"],
+                    Werte:["Freiheit", "Abenteuer"]
+                },
+                {
+                    Name:"Aiko",
+                    Haarfarbe:"blond",
+                    Stil:"elegant",
+                    Alter:26, // Mindestalter für Designer: 21
+                    Herkunft:"japan",
+                    Beruf:"Designer",
+                    Augenfarbe:"braun",
+                    Persönlichkeit:["empathisch"],
+                    Werte:["Bildung", "Offenheit"]
+                },
+                {
+                    Name:"Maria",
+                    Haarfarbe:"schwarz",
+                    Stil:"sportlich",
+                    Alter:35, // Mindestalter für Künstlerin: 20
+                    Herkunft:"italien",
+                    Beruf:"Künstlerin",
+                    Augenfarbe:"grün",
+                    Persönlichkeit:["abenteuerlustig"],
+                    Werte:["Freiheit", "Abenteuer", "Nachhaltigkeit"]
+                }
+            ];
+        }
+
+        // =============================
+        // Zufälliges Profil basierend auf Scores
+        // =============================
+        function getTopAttribute(scoresObj) {
+            let topKey = null;
+            let topVal = -Infinity;
+            for (let k in scoresObj) {
+                if (scoresObj[k] > topVal) { topVal = scoresObj[k]; topKey = k; }
+            }
+            return {key: topKey, val: topVal};
+        }
+
+        function weightedChoice(bestAttr, allAttrs) {
+            const r = Math.random();
+            if (bestAttr.val > 0.3 && r < 0.7) {
+                return bestAttr.key;
+            } else {
+                return allAttrs[Math.floor(Math.random() * allAttrs.length)];
+            }
+        }
+
+        function getRandomProfile() {
+            const hairBest = getTopAttribute(userScores.hairColor); 
+            const styleBest = getTopAttribute(userScores.style);
+            
+            const hairColors = Object.keys(userScores.hairColor);
+            const styles = Object.keys(userScores.style);
+        
+            const chosenHair = weightedChoice(hairBest, hairColors);
+            const chosenStyle = weightedChoice(styleBest, styles);
+        
+            // Alterskategorie basierend auf Beruf
+            const professions = ["Ärztin", "Ingenieurin", "Künstlerin", "Lehrerin", "Designer", "Marketing-Spezialistin", "Unternehmerin"];
+            const randomProfession = professions[Math.floor(Math.random() * professions.length)];
+            let minAge = 20; // Standard-Mindestalter
+            if (professionMinAge[randomProfession.toLowerCase()]) {
+                minAge = professionMinAge[randomProfession.toLowerCase()];
+            }
+
+            const ageCategories = [
+                { min: minAge, max: 24, descriptor: "early twenties" },
+                { min: 25, max: 29, descriptor: "late twenties" },
+                { min: 30, max: 39, descriptor: "thirties" },
+                { min: 40, max: 60, descriptor: "middle-aged" }
+            ];
+            const validAgeCategories = ageCategories.filter(cat => cat.min <= 60 && cat.min >= minAge);
+            const randomAgeCategory = validAgeCategories[Math.floor(Math.random() * validAgeCategories.length)];
+            const randomAge = Math.floor(Math.random() * (randomAgeCategory.max - randomAgeCategory.min + 1)) + randomAgeCategory.min;
+
+            // Zufällige Attribute
+            const origins = ["japan", "spanien", "deutschland", "frankreich", "italien", "afrika", "latina", "international"];
+            const eyeColors = ["blau", "braun", "grün", "haselnuss", "grau"];
+            const personalityOptions = ["humorvoll", "empathisch", "abenteuerlustig", "ruhig", "gesellig"];
+            const werteOptions = ["Bildung", "Offenheit", "Ehrlichkeit", "Treue", "Freiheit", "Abenteuer", "Nachhaltigkeit", "Familie"];
+
+            const randomOrigin = origins[Math.floor(Math.random() * origins.length)];
+            const randomEyeColor = eyeColors[Math.floor(Math.random() * eyeColors.length)];
+            const randomPersonality = [personalityOptions[Math.floor(Math.random() * personalityOptions.length)]];
+            const randomWerte = getRandomWerte();
+
+            return {
+                Name: "Marie",
+                Haarfarbe: chosenHair,
+                Stil: chosenStyle,
+                Alter: randomAge,
+                Herkunft: randomOrigin,
+                Beruf: randomProfession,
+                Augenfarbe: randomEyeColor,
+                Persönlichkeit: randomPersonality,
+                Werte: randomWerte
+            };
+        }
+
+        function getRandomWerte() {
+            const werteOptions = ["Bildung", "Offenheit", "Ehrlichkeit", "Treue", "Freiheit", "Abenteuer", "Nachhaltigkeit", "Familie"];
+            const numberOfWerte = Math.floor(Math.random() * 3) + 1; // 1-3 Werte
+            let selectedWerte = [];
+            while (selectedWerte.length < numberOfWerte) {
+                const wert = werteOptions[Math.floor(Math.random() * werteOptions.length)];
+                if (!selectedWerte.includes(wert)) {
+                    selectedWerte.push(wert);
+                }
+            }
+            return selectedWerte;
+        }
+
+        // =============================
+        // Karte erstellen
+        // =============================
+        async function createCard(attrs = null) {
+            if(!attrs) {
+                attrs = getRandomProfile();
+            }
+        
+            const prompt = buildPrompt(attrs);
+            const imageUrl = await getImageFromWebhook(prompt);
+        
+            const ethnic = getEthnicTerm(attrs.Herkunft);
+            const infoHTML = `
+            <div class="profile-info">
+                <h4>Basisinfos</h4>
+                <p>👩‍💼 ${attrs.Beruf}</p>
+                <p>🎂 ${attrs.Alter} Jahre${ethnic ? ', ' + ethnic : ''}</p>
+                <p>💇‍♀️ ${attrs.Haarfarbe}, 👀 ${attrs.Augenfarbe}, 👗 ${attrs.Stil}</p>
+        
+                <h4>Langfristig</h4>
+                <p>🙂 ${attrs.Persönlichkeit}</p>
+                <p>💎 ${attrs.Werte.join(", ")}</p>
+            </div>`;
+
+            const card = document.createElement('div');
+            card.classList.add('card');
+            card.dataset.attrs = JSON.stringify(attrs);
+            card.dataset.rated = "false";
+            card.innerHTML = `
+                <img src="${imageUrl}" alt="Portrait von ${attrs.Name}" loading="lazy">
+                <div class="info">${infoHTML}</div>
+                <div class="actions">
+                    <button class="fuckBtn" aria-label="Fuck">Fuck</button>
+                    <button class="marryBtn" aria-label="Marry">Marry</button>
+                    <button class="killBtn" aria-label="Kill">Kill</button>
+                </div>
+            `;
+            return card;
+        }
+
+        // =============================
+        // Karten anzeigen
+        // =============================
+        function displayCards(cards) {
+            const container = document.getElementById('cardContainer');
+            container.innerHTML = '';
+            cards.forEach(c => {
+                container.appendChild(c);
+                const fuckBtn = c.querySelector('.fuckBtn');
+                const marryBtn = c.querySelector('.marryBtn');
+                const killBtn = c.querySelector('.killBtn');
+
+                fuckBtn.addEventListener('click', () => handleSelection(c, "fuck"));
+                marryBtn.addEventListener('click', () => handleSelection(c, "marry"));
+                killBtn.addEventListener('click', () => handleSelection(c, "kill"));
+            });
+            currentCards = cards;
+        }
+
+        // =============================
+        // Karten vorpuffern mit Fehlerbehandlung
+        // =============================
+        async function prefetchCards(count = 3) {
+            const tasks = Array.from({length: count}, () => createCard());
+            const results = await Promise.allSettled(tasks);
+            nextCards = results.map(result => {
+                if (result.status === 'fulfilled') {
+                    return result.value;
+                } else {
+                    // Ersetze fehlgeschlagene Karten mit Platzhaltern
+                    const placeholder = document.createElement('div');
+                    placeholder.classList.add('card');
+                    placeholder.innerHTML = `
+                        <img src="https://via.placeholder.com/400x300.png?text=Kein+Bild" alt="Platzhalterbild" loading="lazy">
+                        <div class="info">
+                            <h4>Kein Profil verfügbar</h4>
+                            <p>Leider konnte das Bild nicht geladen werden.</p>
+                        </div>
+                        <div class="actions">
+                            <button class="fuckBtn" aria-label="Fuck">Fuck</button>
+                            <button class="marryBtn" aria-label="Marry">Marry</button>
+                            <button class="killBtn" aria-label="Kill">Kill</button>
+                        </div>
+                    `;
+                    // Füge Event-Listener hinzu
+                    const fuckBtn = placeholder.querySelector('.fuckBtn');
+                    const marryBtn = placeholder.querySelector('.marryBtn');
+                    const killBtn = placeholder.querySelector('.killBtn');
+
+                    fuckBtn.addEventListener('click', () => handleSelection(placeholder, "fuck"));
+                    marryBtn.addEventListener('click', () => handleSelection(placeholder, "marry"));
+                    killBtn.addEventListener('click', () => handleSelection(placeholder, "kill"));
+
+                    return placeholder;
+                }
+            });
+        }
+
+        // =============================
+        // Initiale Karten laden
+        // =============================
+        async function loadInitialCards() {
+            showLoader();
+            try {
+                const initialProfiles = distinctProfilesForFirstRound();
+                const initialTasks = initialProfiles.map(p => createCard(p));
+                const initialCards = await Promise.allSettled(initialTasks);
+
+                const fulfilledCards = initialCards.map((result, index) => {
+                    if (result.status === 'fulfilled') {
+                        return result.value;
+                    } else {
+                        // Ersetze fehlgeschlagene Karten mit Platzhaltern
+                        const attrs = initialProfiles[index];
+                        const placeholder = document.createElement('div');
+                        placeholder.classList.add('card');
+                        placeholder.innerHTML = `
+                            <img src="https://via.placeholder.com/400x300.png?text=Kein+Bild" alt="Platzhalterbild" loading="lazy">
+                            <div class="info">
+                                <h4>Kein Profil verfügbar</h4>
+                                <p>Leider konnte das Bild nicht geladen werden.</p>
+                            </div>
+                            <div class="actions">
+                                <button class="fuckBtn" aria-label="Fuck">Fuck</button>
+                                <button class="marryBtn" aria-label="Marry">Marry</button>
+                                <button class="killBtn" aria-label="Kill">Kill</button>
+                            </div>
+                        `;
+                        // Füge Event-Listener hinzu
+                        const fuckBtn = placeholder.querySelector('.fuckBtn');
+                        const marryBtn = placeholder.querySelector('.marryBtn');
+                        const killBtn = placeholder.querySelector('.killBtn');
+
+                        fuckBtn.addEventListener('click', () => handleSelection(placeholder, "fuck"));
+                        marryBtn.addEventListener('click', () => handleSelection(placeholder, "marry"));
+                        killBtn.addEventListener('click', () => handleSelection(placeholder, "kill"));
+
+                        return placeholder;
+                    }
+                });
+
+                // Anzeige der initialen Karten
+                displayCards(fulfilledCards);
+
+                // Hide the loader as soon as the first image is loaded
+                const firstCardImage = fulfilledCards[0].querySelector('img');
+                if (firstCardImage.complete) {
+                    hideLoader();
+                } else {
+                    firstCardImage.addEventListener('load', hideLoader);
+                    firstCardImage.addEventListener('error', hideLoader); // in case the image fails to load
+                }
+
+                // Prefetch der nächsten Karten
+                await prefetchCards();
+
+                // Hinweis: Entferne hideLoader() von hier, da wir es oben nach dem Laden des ersten Bildes aufrufen
+                // hideLoader();
+            } catch (err) {
+                console.error('Fehler beim Laden der initialen Karten:', err);
+                showFeedback('Fehler beim Laden der initialen Karten');
+                hideLoader();
+            }
+        }
+
+        // =============================
+        // Karten laden aus dem Puffer
+        // =============================
+        async function loadNextCards() {
+            if (nextCards.length === 0) {
+                await prefetchCards();
+            }
+            displayCards(nextCards);
+            await prefetchCards(); // Prefetch following three
+        }
+
+        // =============================
+        // Bewertung verarbeiten
+        // =============================
+        function handleSelection(card, action) {
+            if (card.dataset.rated === "true") return;
+        
+            card.dataset.rated = "true";
+            const attrs = JSON.parse(card.dataset.attrs);
+            userPreferences.history.push({attrs, action});
+            userPreferences.interactions++;
+        
+            updateScores(attrs, action);
+            updateGamification(action);
+            saveData();
+        
+            if (action === "marry") {
+                card.classList.add('card-marry');
+                showPermanentSymbol(card, '❤️');
+            } else if (action === "fuck") {
+                card.classList.add('card-fuck');
+                showPermanentSymbol(card, '🔥');
+            } else if (action === "kill") {
+                card.classList.add('card-kill');
+                showPermanentSymbol(card, '💀');
+            }
+        
+            checkAndLoadNextCards();
+        }
+
+        function checkAndLoadNextCards() {
+            // Prüfen, ob alle aktuellen Karten bewertet wurden
+            const allRated = currentCards.every(card => card.dataset.rated === "true");
+            if (allRated) {
+                loadNextCards();
+            }
+        }
+
+        function showPermanentSymbol(card, symbolChar) {
+            const symbol = document.createElement('div');
+            symbol.classList.add('symbol');
+            symbol.textContent = symbolChar;
+            card.appendChild(symbol);
+        }
+
+        // =============================
+        // Scores aktualisieren
+        // =============================
+        function updateScores(attrs, action) {
+            let inc = 0;
+            if (action === "marry") inc = 0.2;
+            else if (action === "fuck") inc = 0.1;
+            else if (action === "kill") inc = -0.2;
+        
+            if (attrs.Haarfarbe && userScores.hairColor[attrs.Haarfarbe.toLowerCase()] !== undefined) {
+                userScores.hairColor[attrs.Haarfarbe.toLowerCase()] += inc;
+            }
+            if (attrs.Stil && userScores.style[attrs.Stil.toLowerCase()] !== undefined) {
+                userScores.style[attrs.Stil.toLowerCase()] += inc;
+            }
+            capScores();
+        }
+
+        function capScores() {
+            function cap(obj) {
+                for (let k in obj) {
+                    if (obj[k] > 1) obj[k] = 1;
+                    if (obj[k] < -1) obj[k] = -1;
+                }
+            }
+            cap(userScores.hairColor);
+            cap(userScores.style);
+        }
+
+        // =============================
+        // Gamification punkte
+        // =============================
+        function updateGamification(action) {
+            let p = 0;
+            if (action === "marry") p = 5;
+            else if (action === "fuck") p = 2;
+            else if (action === "kill") p = 0;
+        
+            userPreferences.points += p;
+            document.getElementById('pointsDisplay').textContent = userPreferences.points.toString();
+            let level = Math.floor(userPreferences.points / 50) + 1;
+            document.getElementById('levelDisplay').textContent = level.toString();
+        
+            if (userPreferences.points >= 50 && !userPreferences.badges.includes('Trendsetter')) {
+                userPreferences.badges.push('Trendsetter');
+                const badgeContainer = document.getElementById('badgeContainer');
+                const b = document.createElement('div');
+                b.classList.add('badge');
+                b.textContent = "🌟 Trendsetter";
+                badgeContainer.appendChild(b);
+                openPopup('milestonePopup');
+            }
+        }
+
+        // =============================
+        // Favoriten & Verlauf
+        // =============================
+        function populateFavorites() {
+            const favC = document.getElementById('favoritesContent');
+            favC.innerHTML = '';
+            let favorites = userPreferences.history.filter(h => h.action === "marry");
+            if (favorites.length === 0) {
+                favC.textContent = "Keine Favoriten.";
+                return;
+            }
+            favorites.forEach(f => {
+                const div = document.createElement('div');
+                div.style.marginBottom = "10px";
+                div.textContent = `${f.attrs.Name}, ${f.attrs.Alter} Jahre, ${f.attrs.Haarfarbe}e Haare, ${f.attrs.Stil}er Stil`;
+                favC.appendChild(div);
+            });
+        }
+
+        function populateHistory() {
+            const hC = document.getElementById('historyContent');
+            hC.innerHTML = '';
+            if (userPreferences.history.length === 0) {
+                hC.textContent = "Noch kein Verlauf.";
+                return;
+            }
+            userPreferences.history.forEach((h, i) => {
+                const actionSymbol = (h.action === "marry") ? "❤️" : (h.action === "fuck") ? "🔥" : "💀";
+                const div = document.createElement('div');
+                div.style.marginBottom = "10px";
+                div.textContent = `${i + 1}: ${h.attrs.Name}, ${h.attrs.Alter} Jahre, ${h.attrs.Haarfarbe}e Haare, ${h.attrs.Stil}er Stil - ${h.action.toUpperCase()} ${actionSymbol}`;
+                hC.appendChild(div);
+            });
+        }
+
+        // =============================
+        // Charts aktualisieren mit Chart.js
+        // =============================
+        function updateCharts() {
+            // RadarChart
+            const ctxR = document.getElementById('radarChart').getContext('2d');
+            if (window.radarChartInstance) window.radarChartInstance.destroy();
+            window.radarChartInstance = new Chart(ctxR, {
+                type: 'radar',
+                data: {
+                    labels: ['Blond', 'Braun', 'Schwarz', 'Rot', 'Casual', 'Elegant', 'Sportlich', 'Modern'],
+                    datasets: [{
+                        label: 'Deine Vorlieben',
+                        data: [
+                            userScores.hairColor.blond,
+                            userScores.hairColor.braun,
+                            userScores.hairColor.schwarz,
+                            userScores.hairColor.rot,
+                            userScores.style.casual,
+                            userScores.style.elegant,
+                            userScores.style.sportlich,
+                            userScores.style.modern
+                        ],
+                        backgroundColor: 'rgba(255, 121, 198, 0.2)',
+                        borderColor: 'rgba(255, 121, 198, 1)',
+                        borderWidth: 1,
+                        pointBackgroundColor: 'rgba(255, 121, 198, 1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            min: -1,
+                            max: 1,
+                            ticks: {
+                                stepSize: 0.5
+                            }
+                        }
+                    }
+                }
+            });
+
+            // BarChart
+            const ctxB = document.getElementById('barChart').getContext('2d');
+            if (window.barChartInstance) window.barChartInstance.destroy();
+            window.barChartInstance = new Chart(ctxB, {
+                type: 'bar',
+                data: {
+                    labels: ['Blond', 'Braun', 'Schwarz', 'Rot', 'Casual', 'Elegant', 'Sportlich', 'Modern'],
+                    datasets: [
+                        {
+                            label: 'Haarfarben',
+                            data: [
+                                userScores.hairColor.blond,
+                                userScores.hairColor.braun,
+                                userScores.hairColor.schwarz,
+                                userScores.hairColor.rot,
+                                0, 0, 0, 0
+                            ],
+                            backgroundColor: '#ff79c6'
+                        },
+                        {
+                            label: 'Stil',
+                            data: [
+                                0, 0, 0, 0,
+                                userScores.style.casual,
+                                userScores.style.elegant,
+                                userScores.style.sportlich,
+                                userScores.style.modern
+                            ],
+                            backgroundColor: '#8be9fd'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            min: -1,
+                            max: 1,
+                            ticks: {
+                                stepSize: 0.5
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // =============================
+        // Daten speichern und laden mit localStorage
+        // =============================
+        function saveData() {
+            localStorage.setItem('userPreferences', JSON.stringify(userPreferences));
+            localStorage.setItem('userScores', JSON.stringify(userScores));
+        }
+
+        function loadData() {
+            const prefs = localStorage.getItem('userPreferences');
+            const scores = localStorage.getItem('userScores');
+            if (prefs) userPreferences = JSON.parse(prefs);
+            if (scores) userScores = JSON.parse(scores);
+        }
+
+        // =============================
+        // Event Listener für Buttons
+        // =============================
+        document.getElementById('showTutorialBtn').addEventListener('click', () => openPopup('tutorialPopup'));
+        document.getElementById('startButton').addEventListener('click', () => {
+            closePopup('tutorialPopup');
+            loadInitialCards();
+        });
+        document.getElementById('openFavorites').addEventListener('click', () => { populateFavorites(); openPopup('favoritesPopup'); });
+        document.getElementById('openHistory').addEventListener('click', () => { populateHistory(); openPopup('historyPopup'); });
+        document.getElementById('showScores').addEventListener('click', () => { updateCharts(); openPopup('scoresPopup'); });
+
+        // =============================
+        // Start der Anwendung
+        // =============================
+        window.onload = () => {
+            loadData();
+            openPopup('tutorialPopup');
+        };
+    </script>
+</body>
+</html>
